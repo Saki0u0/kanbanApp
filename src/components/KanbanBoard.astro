@@ -1,7 +1,3 @@
----
-import { tasks, addTask } from "../lib/taskStore";
----
-
 <div class="flex gap-4">
   <div class="mb-4">
     <form id="add-task-form">
@@ -15,7 +11,7 @@ import { tasks, addTask } from "../lib/taskStore";
 </div>
 
 <script>
-  import { tasks, addTask } from "../lib/taskStore";
+  import { columns, addTask } from "../lib/taskStore";
 
   const form = document.getElementById("add-task-form");
   if (!form) throw new Error("add-task-form not found");
@@ -24,22 +20,21 @@ import { tasks, addTask } from "../lib/taskStore";
 
   form.addEventListener("submit", (e) => {
     e.preventDefault();
-    const title = "Title";
-    const description = "Description";
-
-    addTask(title, description);
+    console.log("submit");
+    const title = "Hoge";
+    const description = "XX";
+    addTask("todo", title, description);
   });
 
-  tasks.subscribe(($tasks) => {
-    taskList.innerHTML = $tasks
+  columns.subscribe(($columns) => {
+    taskList.innerHTML = $columns
       .map(
-        (task) => `
-      <div class="border border-gray-300 rounded-md p-4">
-        <h3 class="text-lg font-bold">${task.title}</h3>
-        <p class="text-gray-500">${task.description}</p>
-        <p class="text-gray-500">Status: ${task.status}</p>
-      </div>
-    `
+        (column) => `
+          <div class="border border-gray-300 rounded-md p-4">
+            <h3 class="text-lg font-bold">${column.title}</h3>
+            <p class="text-gray-500">${column.tasks.map((task) => task.title).join(", ")}</p>
+          </div>
+        `
       )
       .join("");
   });
