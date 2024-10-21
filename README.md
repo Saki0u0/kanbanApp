@@ -51,4 +51,4 @@ These are **optional** but if you wish to add more functionality to your Kanban 
 
 Each team will have 10-15 minutes to present their web app. In addition to your Kanban board, you can present your mockup design, GitHub Project, challenges you faced, and what you have learned.
 
-Good luck! :)
+Good luck! 
