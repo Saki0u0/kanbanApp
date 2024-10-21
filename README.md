@@ -44,7 +44,7 @@ These are **optional** but if you wish to add more functionality to your Kanban 
 - Assign task to one or more users
 - Add, Edit, Delete Columns
 - Marking task as complete will automatically move it to the *Done* column
-- Sort each column by task due date
+- Sort each column by task due date with a button click
 
 ## Presentation 📽️
 
