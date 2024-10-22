@@ -31,7 +31,7 @@ export class TaskContext {
       tasks: [
         { id: 3, title: "Task 3", description: "Description 3", label: "done" },
       ],
-      label: 'in-progress',
+      label: 'done',
     },
   ])
 
@@ -70,7 +70,7 @@ export class TaskContext {
   }
 
   deleteTask() {
-    
+
   }
 
 }
