@@ -1,17 +1,21 @@
+---
+
+---
+
 <div class="flex gap-4">
   <div class="mb-4">
     <form id="add-task-form">
       <button type="submit">Add Task</button>
     </form>
   </div>
-
-  <div id="task-list">
+  <div id="task-list" class="flex gap-4">
     <!-- タスクリストがここに表示されます -->
   </div>
 </div>
 
 <script>
   import { columns, addTask } from "../lib/taskStore";
+  import Sortable from "sortablejs";
 
   const form = document.getElementById("add-task-form");
   if (!form) throw new Error("add-task-form not found");
@@ -26,16 +30,60 @@
     addTask("todo", title, description);
   });
 
+  declare global {
+    interface Window {
+      simpleAlert: () => void;
+    }
+  }
+
+  window.simpleAlert = () => {
+    alert("simpleAlert");
+  };
+
   columns.subscribe(($columns) => {
+    let ids: string[] = [];
     taskList.innerHTML = $columns
-      .map(
-        (column) => `
-          <div class="border border-gray-300 rounded-md p-4">
-            <h3 class="text-lg font-bold">${column.title}</h3>
-            <p class="text-gray-500">${column.tasks.map((task) => task.title).join(", ")}</p>
-          </div>
-        `
-      )
+      .map((column) => {
+        ids.push(`column-${column.id}`);
+        return `
+            <div id="column-${column.id}" class="border border-gray-300 rounded-md p-4 bg-[#E1E1E1] w-[400px]">
+                <div class="flex justify-between">
+                    <h3 class="text-lg font-inter">${column.title}</h3>
+                    <div class="flex gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" onclick="window.simpleAlert()">
+                            <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                        </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="cursor-pointer">
+                            <path fill="currentColor" d="M16 12a2 2 0 0 1 2-2a2 2 0 0 1 2 2a2 2 0 0 1-2 2a2 2 0 0 1-2-2m-6 0a2 2 0 0 1 2-2a2 2 0 0 1 2 2a2 2 0 0 1-2 2a2 2 0 0 1-2-2m-6 0a2 2 0 0 1 2-2a2 2 0 0 1 2 2a2 2 0 0 1-2 2a2 2 0 0 1-2-2"/>
+                        </svg>
+                    </div>
+                </div>
+              <div class="flex flex-col gap-2 sortable-container min-h-12">
+                ${column.tasks
+                  .map(
+                    (task) => `
+                  <div class="border border-gray-300 rounded-md p-2 bg-[#ffffff]">
+                    <h4 class="text-sm font-bold">${task.title}</h4>
+                    <p class="text-sm">${task.description}</p>
+                  </div>
+                `
+                  )
+                  .join("")}
+              </div>
+            </div>
+          `;
+      })
       .join("");
+    ids?.forEach((id) => {
+      const element = document
+        .getElementById(id)
+        ?.querySelector(".sortable-container");
+      if (!element) return;
+      new Sortable(element as HTMLElement, {
+        group: "shared",
+        animation: 150,
+        emptyInsertThreshold: 20,
+      });
+    });
   });
 </script>
