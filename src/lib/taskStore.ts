@@ -1,8 +1,7 @@
 import { atom } from "nanostores";
 import type { Task } from "./task";
 import type { Column } from "./columns";
-
-const $tasks = atom<Task[]>([]);
+import { columns } from "./pre";
 
 export class TaskContext {
   private $columns = atom<Column[]>([{
@@ -52,41 +51,40 @@ export class TaskContext {
     targetColumn.tasks = [...targetColumn.tasks, newTask]
 
     this.$columns.set(this.$columns.get().map((c) => (c.label === label ? targetColumn : c)));
-    $tasks.set([...$tasks.get(), newTask]);
   }
 
-  updateTaskLabel(id: number, label: string) {
-    const tasks = $tasks.get();
-    $tasks.set(
-      tasks.map((task) => (task.id === id ? { ...task, label } : task))
-    );
+  updateTaskLabel(taskId: number, preLabel: string, newLabel: string) {
+    const targetColumn = this.$columns.get().find(column => column.label === preLabel);
+
+    if(!targetColumn) return;
+
+    const updatedTasks = targetColumn.tasks.map(task => task.id === taskId ? {...task, label: newLabel} : task)
+
+    const updatedColumn = {...targetColumn, tasks: updatedTasks}
+
+    this.$columns.set(this.$columns.get().map((c) => (c.label === preLabel ? updatedColumn : c)));
   }
 
-  editTask(id: number, newTitle: string, newDescription: string, label: string) {
+  editTask(label: string, taskId: number, newTitle: string, newDescription: string) {
     const targetColumn = this.$columns.get().find(column => column.label === label)
     if(!targetColumn) return;
 
-    targetColumn.tasks = targetColumn.tasks.map(task => task.id === id ? {...task, title: newTitle, description: newDescription } : task)
+    targetColumn.tasks = targetColumn.tasks.map(task => task.id === taskId ? {...task, title: newTitle, description: newDescription } : task)
 
     this.$columns.set(this.$columns.get().map((c) => (c.label === label ? targetColumn : c)));
 
-    $tasks.set($tasks.get().map(task => task.id === id ? {...task,title: newTitle, description: newDescription} : task))
   }
 
   deleteTask(id: number, label: string) {
-    const tasks = $tasks.get();
     const targetColumn = this.$columns.get().find(column => column.label === label)
 
     if(!targetColumn) return;
-
-    const updatedTasks = tasks.filter(task => task.id !== id)
-    $tasks.set(updatedTasks)
 
     const updateColumnTasks = targetColumn.tasks.filter(task => task.id !== id)
 
     // entire column
     this.$columns.set(this.$columns.get().map((c) => (c.label === label ? {...targetColumn, tasks: updateColumnTasks} : c)));
 
-    console.log(targetColumn)
+    console.log(this.$columns.get())
   }
 }
