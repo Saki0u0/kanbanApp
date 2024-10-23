@@ -36,7 +36,7 @@ export class TaskContext {
   ]);
 
   addTask(title: string, description: string, label: string) {
-    const columns = this.$columns.get()
+    const columns = this.$columns.get();
     const targetColumn = columns.find((column) => column.label === label);
 
     if (!targetColumn) return;
@@ -53,31 +53,34 @@ export class TaskContext {
     this.$columns.set(
       columns.map((c) => (c.label === label ? targetColumn : c))
     );
-  }
+  };
 
   updateTaskLabel(taskId: number, preLabel: string, newLabel: string) {
-    const columns = this.$columns.get()
+    const columns = this.$columns.get();
 
     const targetColumn = columns.find((column) => column.label === preLabel);
     if (!targetColumn) return;
 
     // change task label
-    const updatedTask = targetColumn.tasks.find((task) => task.id === taskId)
-    if(!updatedTask) return;
+    const updatedTask = targetColumn.tasks.find((task) => task.id === taskId);
+    if (!updatedTask) return;
 
-    const updatedTaskNewLabel = {...updatedTask, label: newLabel}
+    const updatedTaskNewLabel = { ...updatedTask, label: newLabel };
 
     // previous task
     const removedTask = targetColumn.tasks.filter((task) => task.id !== taskId);
-    if(!removedTask) return;
+    if (!removedTask) return;
 
-    const updatedPreColumn = {...targetColumn, tasks: removedTask}
+    const updatedPreColumn = { ...targetColumn, tasks: removedTask };
 
-    // new 
-    const newColumn = columns.find(column => column.label === newLabel)
-    if(!newColumn) return;
+    // new
+    const newColumn = columns.find((column) => column.label === newLabel);
+    if (!newColumn) return;
 
-    const updatedNewColumn = {...newColumn, tasks: [...newColumn.tasks, updatedTaskNewLabel] }
+    const updatedNewColumn = {
+      ...newColumn,
+      tasks: [...newColumn.tasks, updatedTaskNewLabel],
+    };
 
     // update entire
     this.$columns.set(
@@ -87,7 +90,7 @@ export class TaskContext {
     this.$columns.set(
       columns.map((c) => (c.label === preLabel ? updatedPreColumn : c))
     );
-  }
+  };
 
   editTask(
     label: string,
@@ -109,7 +112,7 @@ export class TaskContext {
     this.$columns.set(
       this.$columns.get().map((c) => (c.label === label ? targetColumn : c))
     );
-  }
+  };
 
   deleteTask(id: number, label: string) {
     const targetColumn = this.$columns
@@ -132,5 +135,5 @@ export class TaskContext {
     );
 
     console.log(this.$columns.get());
-  }
-}
+  };
+};
