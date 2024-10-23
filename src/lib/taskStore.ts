@@ -116,9 +116,6 @@ export class TaskContext {
     // Remove the task from the source column and get it
     const [task] = fromColumn.tasks.splice(taskIndex, 1);
 
-    // Update the task's label
-    task.label = toColumnLabel;
-
     // Insert the task at the new index in the destination column
     toColumn.tasks.splice(newIndex, 0, task);
 
