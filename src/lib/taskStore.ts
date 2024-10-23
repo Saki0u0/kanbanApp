@@ -8,7 +8,7 @@ export class TaskContext {
       tasks: [
         { id: 1, title: "Titile", description: "Description 1", label: "todo" },
       ],
-      label: "todo",
+      label: "To Do",
     },
     {
       tasks: [
@@ -16,21 +16,31 @@ export class TaskContext {
           id: 2,
           title: "Task 2",
           description: "Description 2",
-          label: "in-progress",
+          label: "In Progress",
         },
       ],
-      label: "in-progress",
+      label: "In Progress",
     },
     {
       tasks: [
         { id: 3, title: "Task 3", description: "Description 3", label: "done" },
       ],
-      label: "done",
+      label: "Done",
     },
   ]);
 
   getColumns() {
     return this.$columns;
+  }
+
+  updateColumnLabel(label: string, newLabel: string) {
+    const columns = this.$columns.get();
+    const targetColumn = columns.find((column) => column.label === label);
+    if (!targetColumn) return;
+
+    targetColumn.label = newLabel;
+
+    this.$columns.set(columns);
   }
 
   addTask(title: string, description: string, label: string) {
