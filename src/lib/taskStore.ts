@@ -35,6 +35,10 @@ export class TaskContext {
     },
   ]);
 
+  getColumns() {
+    return this.$columns;
+  }
+
   addTask(title: string, description: string, label: string) {
     const columns = this.$columns.get();
     const targetColumn = columns.find((column) => column.label === label);
@@ -53,7 +57,7 @@ export class TaskContext {
     this.$columns.set(
       columns.map((c) => (c.label === label ? targetColumn : c))
     );
-  };
+  }
 
   updateTaskLabel(taskId: number, preLabel: string, newLabel: string) {
     const columns = this.$columns.get();
@@ -90,7 +94,7 @@ export class TaskContext {
     this.$columns.set(
       columns.map((c) => (c.label === preLabel ? updatedPreColumn : c))
     );
-  };
+  }
 
   editTask(
     label: string,
@@ -112,7 +116,7 @@ export class TaskContext {
     this.$columns.set(
       this.$columns.get().map((c) => (c.label === label ? targetColumn : c))
     );
-  };
+  }
 
   deleteTask(id: number, label: string) {
     const targetColumn = this.$columns
@@ -135,5 +139,5 @@ export class TaskContext {
     );
 
     console.log(this.$columns.get());
-  };
-};
+  }
+}
