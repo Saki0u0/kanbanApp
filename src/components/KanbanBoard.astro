@@ -48,11 +48,11 @@
     let ids: string[] = [];
     taskList.innerHTML = columns
       .map((column) => {
-        ids.push(`column-${column.id}`);
+        ids.push(`column-${column.label}`);
         return `
-            <div id="column-${column.id}" class="border border-gray-300 rounded-xl p-4 bg-[#E1E1E1] w-[400px]">
+            <div id="column-${column.label}" class="border border-gray-300 rounded-xl p-4 bg-[#E1E1E1] w-[400px]">
                 <div class="flex justify-between mb-4">
-                    <h3 class="text-lg font-inter">${column.title}</h3>
+                    <h3 class="text-lg font-inter">${column.label}</h3>
                     <div class="flex gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" onclick="window.simpleAlert()">
                             <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>

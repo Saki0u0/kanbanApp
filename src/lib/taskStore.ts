@@ -5,16 +5,12 @@ import type { Column } from "./columns";
 export class TaskContext {
   private $columns = atom<Column[]>([
     {
-      id: 1,
-      title: "To Do",
       tasks: [
         { id: 1, title: "Titile", description: "Description 1", label: "todo" },
       ],
       label: "todo",
     },
     {
-      id: 2,
-      title: "In Progress",
       tasks: [
         {
           id: 2,
@@ -26,8 +22,6 @@ export class TaskContext {
       label: "in-progress",
     },
     {
-      id: 3,
-      title: "Done",
       tasks: [
         { id: 3, title: "Task 3", description: "Description 3", label: "done" },
       ],
