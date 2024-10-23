@@ -3,6 +3,7 @@ import type { Task } from "./task";
 import type { Column } from "./columns";
 
 export class TaskContext {
+  private listnerFunctions: (() => void)[] = [];
   private $columns = atom<Column[]>([
     {
       tasks: [
@@ -33,6 +34,19 @@ export class TaskContext {
     return this.$columns;
   }
 
+  addColumn(label: string) {
+    const columns = this.$columns.get();
+    let newLabel = label;
+    let counter = 1;
+    while (columns.find((column) => column.label === newLabel)) {
+      newLabel = `${label} ${counter}`;
+      counter++;
+    }
+    columns.push({ label: newLabel, tasks: [] });
+    this.$columns.set(columns);
+    this.notifyListeners();
+  }
+
   updateColumnLabel(label: string, newLabel: string) {
     const columns = this.$columns.get();
     const targetColumn = columns.find((column) => column.label === label);
@@ -41,6 +55,7 @@ export class TaskContext {
     targetColumn.label = newLabel;
 
     this.$columns.set(columns);
+    this.notifyListeners();
   }
 
   addTask(title: string, description: string, label: string) {
@@ -61,6 +76,7 @@ export class TaskContext {
     this.$columns.set(
       columns.map((c) => (c.label === label ? targetColumn : c))
     );
+    this.notifyListeners();
   }
 
   updateTaskLabel(taskId: number, preLabel: string, newLabel: string) {
@@ -95,9 +111,7 @@ export class TaskContext {
       columns.map((c) => (c.label === newLabel ? updatedNewColumn : c))
     );
 
-    this.$columns.set(
-      columns.map((c) => (c.label === preLabel ? updatedPreColumn : c))
-    );
+    this.notifyListeners();
   }
 
   moveTask(
@@ -125,6 +139,7 @@ export class TaskContext {
 
     // Update the columns in the store
     this.$columns.set([...columns]);
+    this.notifyListeners();
   }
 
   editTask(
@@ -147,6 +162,7 @@ export class TaskContext {
     this.$columns.set(
       this.$columns.get().map((c) => (c.label === label ? targetColumn : c))
     );
+    this.notifyListeners();
   }
 
   deleteTask(id: number, label: string) {
@@ -169,6 +185,14 @@ export class TaskContext {
         )
     );
 
-    console.log(this.$columns.get());
+    this.notifyListeners();
+  }
+
+  addListener(listener: () => void) {
+    this.listnerFunctions.push(listener);
+  }
+
+  notifyListeners() {
+    this.listnerFunctions.forEach((listener) => listener());
   }
 }
