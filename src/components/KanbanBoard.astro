@@ -62,11 +62,11 @@
                         </svg>
                     </div>
                 </div>
-              <div class="flex flex-col gap-2 sortable-container min-h-12">
+              <div class="flex flex-col gap-2 sortable-container min-h-12" data-column-label="${column.label}">
                 ${column.tasks
                   .map(
                     (task) => `
-                  <div class="border border-gray-300 rounded-md p-2 bg-[#ffffff]">
+                  <div class="border border-gray-300 rounded-md p-2 bg-[#ffffff]" data-task-id="${task.id}">
                     <h4 class="text-sm font-bold">${task.title}</h4>
                     <p class="text-sm">${task.description}</p>
                   </div>
@@ -87,6 +87,20 @@
         group: "shared",
         animation: 150,
         emptyInsertThreshold: 20,
+        onEnd: (event) => {
+          const taskId = event.item.getAttribute("data-task-id");
+          const fromColumnLabel =
+            event.from.getAttribute("data-column-label") ?? "";
+          const toColumnLabel =
+            event.to.getAttribute("data-column-label") ?? "";
+          const newIndex = event.newIndex ?? 0;
+          taskContext.moveTask(
+            Number(taskId),
+            fromColumnLabel,
+            toColumnLabel,
+            newIndex
+          );
+        },
       });
     });
   }

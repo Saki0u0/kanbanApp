@@ -96,6 +96,36 @@ export class TaskContext {
     );
   }
 
+  moveTask(
+    taskId: number,
+    fromColumnLabel: string,
+    toColumnLabel: string,
+    newIndex: number
+  ) {
+    const columns = this.$columns.get();
+    const fromColumn = columns.find(
+      (column) => column.label === fromColumnLabel
+    );
+    const toColumn = columns.find((column) => column.label === toColumnLabel);
+
+    if (!fromColumn || !toColumn) return;
+
+    const taskIndex = fromColumn.tasks.findIndex((task) => task.id === taskId);
+    if (taskIndex === -1) return;
+
+    // Remove the task from the source column and get it
+    const [task] = fromColumn.tasks.splice(taskIndex, 1);
+
+    // Update the task's label
+    task.label = toColumnLabel;
+
+    // Insert the task at the new index in the destination column
+    toColumn.tasks.splice(newIndex, 0, task);
+
+    // Update the columns in the store
+    this.$columns.set([...columns]);
+  }
+
   editTask(
     label: string,
     taskId: number,
