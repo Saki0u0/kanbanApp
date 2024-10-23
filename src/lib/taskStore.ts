@@ -8,7 +8,7 @@ export class TaskContext {
       id: 1,
       title: "To Do",
       tasks: [
-        { id: 1, title: "Task 1", description: "Description 1", label: "todo" },
+        { id: 1, title: "Titile", description: "Description 1", label: "todo" },
       ],
       label: "todo",
     },

@@ -50,8 +50,8 @@
       .map((column) => {
         ids.push(`column-${column.id}`);
         return `
-            <div id="column-${column.id}" class="border border-gray-300 rounded-md p-4 bg-[#E1E1E1] w-[400px]">
-                <div class="flex justify-between">
+            <div id="column-${column.id}" class="border border-gray-300 rounded-xl p-4 bg-[#E1E1E1] w-[400px]">
+                <div class="flex justify-between mb-4">
                     <h3 class="text-lg font-inter">${column.title}</h3>
                     <div class="flex gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" onclick="window.simpleAlert()">
@@ -66,9 +66,14 @@
                 ${column.tasks
                   .map(
                     (task) => `
-                  <div class="border border-gray-300 rounded-md p-2 bg-[#ffffff]" data-task-id="${task.id}">
-                    <h4 class="text-sm font-bold">${task.title}</h4>
-                    <p class="text-sm">${task.description}</p>
+                  <div class="border border-gray-300 rounded-xl p-2 bg-[#ffffff] p-4 hover:translate-y-[-4px] hover:shadow-lg transition-transform duration-300" data-task-id="${task.id}">
+                    <div class="flex justify-between">
+                      <h4 class="text-2xl ">${task.title}</h4>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="cursor-pointer">
+                        <path fill="currentColor" d="M16 12a2 2 0 0 1 2-2a2 2 0 0 1 2 2a2 2 0 0 1-2 2a2 2 0 0 1-2-2m-6 0a2 2 0 0 1 2-2a2 2 0 0 1 2 2a2 2 0 0 1-2 2a2 2 0 0 1-2-2m-6 0a2 2 0 0 1 2-2a2 2 0 0 1 2 2a2 2 0 0 1-2 2a2 2 0 0 1-2-2"/>
+                      </svg>
+                    </div>
+                    <p class="text-sm py-2">${task.description}</p>
                   </div>
                 `
                   )
