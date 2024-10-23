@@ -1,12 +1,9 @@
----
-
----
-
 <div class="flex gap-4">
   <div class="mb-4">
     <form id="add-task-form">
       <button type="submit">Add Task</button>
     </form>
+    <button type="button" id="add-column-button">Add Column</button>
   </div>
   <div id="task-list" class="flex gap-4">
     <!-- タスクリストがここに表示されます -->
@@ -28,7 +25,13 @@
     console.log("submit");
     const title = "Hoge";
     const description = "XX";
-    taskContext.addTask(title, description, "todo");
+    taskContext.addTask(title, description, "To Do");
+  });
+
+  const addColumnButton = document.getElementById("add-column-button");
+  if (!addColumnButton) throw new Error("add-column-button not found");
+  addColumnButton.addEventListener("click", () => {
+    taskContext.addColumn("New Column");
   });
 
   declare global {
@@ -48,11 +51,11 @@
     let ids: string[] = [];
     taskList.innerHTML = columns
       .map((column) => {
-        ids.push(`column-${column.id}`);
+        ids.push(`column-${column.label}`);
         return `
-            <div id="column-${column.id}" class="border border-gray-300 rounded-md p-4 bg-[#E1E1E1] w-[400px]">
-                <div class="flex justify-between">
-                    <h3 class="text-lg font-inter">${column.title}</h3>
+            <div id="column-${column.label}" class="border border-gray-300 rounded-[24px] p-6 bg-[#E1E1E1] w-[400px]">
+                <div class="flex justify-between mb-4">
+                    <h3 id="column-title-${column.label}" class="text-2xl font-inter column-title focus:outline-none px-2 py-0.5 rounded-md focus:bg-[#F0F0F0]" data-column-id="${column.label}" contenteditable="true">${column.label}</h3>
                     <div class="flex gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" onclick="window.simpleAlert()">
                             <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
@@ -62,13 +65,18 @@
                         </svg>
                     </div>
                 </div>
-              <div class="flex flex-col gap-2 sortable-container min-h-12">
+              <div class="flex flex-col gap-2 sortable-container min-h-12" data-column-label="${column.label}">
                 ${column.tasks
                   .map(
                     (task) => `
-                  <div class="border border-gray-300 rounded-md p-2 bg-[#ffffff]">
-                    <h4 class="text-sm font-bold">${task.title}</h4>
-                    <p class="text-sm">${task.description}</p>
+                  <div class="border border-gray-300 rounded-[24px] p-2 bg-[#ffffff] p-4 hover:translate-y-[-4px] hover:shadow-lg transition-transform duration-300" data-task-id="${task.id}">
+                    <div class="flex justify-between">
+                      <h4 class="text-2xl ">${task.title}</h4>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="cursor-pointer">
+                        <path fill="currentColor" d="M5 3c-1.11 0-2 .89-2 2v14c0 1.11.89 2 2 2h14c1.11 0 2-.89 2-2v-7h-2v7H5V5h7V3H5m12.78 1a.69.69 0 0 0-.48.2l-1.22 1.21l2.5 2.5L19.8 6.7c.26-.26.26-.7 0-.95L18.25 4.2c-.13-.13-.3-.2-.47-.2m-2.41 2.12L8 13.5V16h2.5l7.37-7.37l-2.5-2.5Z"/>
+                      </svg>
+                    </div>
+                    <p class="text-sm py-2">${task.description}</p>
                   </div>
                 `
                   )
@@ -87,15 +95,50 @@
         group: "shared",
         animation: 150,
         emptyInsertThreshold: 20,
+        onEnd: (event) => {
+          const taskId = event.item.getAttribute("data-task-id");
+          const fromColumnLabel =
+            event.from.getAttribute("data-column-label") ?? "";
+          const toColumnLabel =
+            event.to.getAttribute("data-column-label") ?? "";
+          const newIndex = event.newIndex ?? 0;
+          taskContext.moveTask(
+            Number(taskId),
+            fromColumnLabel,
+            toColumnLabel,
+            newIndex
+          );
+        },
+      });
+    });
+  }
+
+  function setupColumnLabelEditing() {
+    const columnTitles = document.querySelectorAll(".column-title");
+    columnTitles.forEach((title) => {
+      title.addEventListener("blur", function (this: HTMLElement) {
+        const columnId = title.getAttribute("data-column-id");
+        const newTitle = title.textContent?.trim();
+        if (newTitle && columnId) {
+          taskContext.updateColumnLabel(columnId, newTitle);
+        }
+      });
+
+      title.addEventListener("keydown", function (this: HTMLElement, e: Event) {
+        const event = e as KeyboardEvent;
+        if (event.key === "Enter") {
+          e.preventDefault();
+          this.blur();
+        }
       });
     });
   }
 
   // 初期レンダリング
   renderTasks();
+  setupColumnLabelEditing();
 
-  // storeの変更を監視
-  taskContext.getColumns().subscribe(() => {
-    renderTasks();
-  });
+  // listener
+  taskContext.addListener(renderTasks);
+  taskContext.addListener(setupColumnLabelEditing);
 </script>
