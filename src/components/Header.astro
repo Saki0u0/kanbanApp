@@ -1,7 +1,18 @@
 ---
-
+import '@fontsource/henny-penny';
+import { Icon } from 'astro-icon/components';
 ---
 
-<header class="text-white p-4">
-  <nav>Search</nav>
+<header class="grid text-white pt-10 px-4 pb-6 grid-cols-1 gap-6 bg-[url('/illust.svg')] bg-no-repeat bg-left-bottom lg:container lg:mx-auto lg:grid-cols-4 lg:py-12 lg:items-center lg:[background-position-y:calc(100%+8px)]">
+  <h1 class="font-henny text-4xl lg:col-start-2 lg:col-end-3">OO's To Do List</h1>
+  <button class="flex gap-2 items-center order-last justify-self-end lg:order-0 lg:justify-self-start">
+    <Icon name="mdi:plus" />
+    Add column
+  </button>
+  <div class="relative order-2 lg:order-last">
+    <input class="p-4 ps-10 rounded-full text-black w-full lg:px-4 " type="text" placeholder="Hinted search text">
+    <div class="absolute inset-y-0 right-6 flex items-center ps-3 pointer-events-none">
+      <Icon name="mdi:search" class="w-6 h-6 text-gray-500"/>
+    </div>
+  </div>
 </header>
