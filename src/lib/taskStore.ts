@@ -3,11 +3,13 @@ import type { Task } from "./task";
 import type { Column } from "./columns";
 
 export class TaskContext {
-  private listnerFunctions: (() => void)[] = [];
+  private static instance: TaskContext;
+  private filter: string = "";
+  private listenerFunctions: (() => void)[] = [];
   private $columns = atom<Column[]>([
     {
       tasks: [
-        { id: 1, title: "Titile", description: "Description 1", label: "todo" },
+        { id: 1, title: "Title", description: "Description 1", label: "todo" },
       ],
       label: "To Do",
     },
@@ -30,8 +32,42 @@ export class TaskContext {
     },
   ]);
 
+  static getInstance() {
+    if (!TaskContext.instance) {
+      TaskContext.instance = new TaskContext();
+    }
+    return TaskContext.instance;
+  }
+
+  updateFilter(keyword: string) {
+    this.filter = keyword;
+    if (keyword.length >= 3) {
+      this.notifyListeners();
+    } else {
+      this.filter = "";
+      this.notifyListeners();
+    }
+  }
+
   getColumns() {
-    return this.$columns;
+    const filter = this.filter;
+    if (!filter) return this.$columns.get();
+
+    const filteredColumns = this.$columns
+      .get()
+      .map((column) => {
+        const matchedTasks = column.tasks.filter(
+          (task) =>
+            task.title.toLowerCase().includes(this.filter.toLowerCase()) ||
+            task.description.toLowerCase().includes(this.filter.toLowerCase())
+        );
+        return matchedTasks.length > 0
+          ? { ...column, tasks: matchedTasks }
+          : null;
+      })
+      .filter((column) => column !== null);
+
+    return filteredColumns;
   }
 
   addColumn(label: string) {
@@ -189,10 +225,10 @@ export class TaskContext {
   }
 
   addListener(listener: () => void) {
-    this.listnerFunctions.push(listener);
+    this.listenerFunctions.push(listener);
   }
 
   notifyListeners() {
-    this.listnerFunctions.forEach((listener) => listener());
+    this.listenerFunctions.forEach((listener) => listener());
   }
 }
