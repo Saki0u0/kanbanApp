@@ -10,20 +10,31 @@ import { Icon } from "astro-icon/components";
     Add column
   </button>
   <div class="relative order-2 lg:order-last">
-    <input class="p-4 ps-10 rounded-full text-black w-full lg:px-4 " type="text" placeholder="Hinted search text">
-    <div class="absolute inset-y-0 right-6 flex items-center ps-3 pointer-events-none">
+    <input class="p-4 ps-10 rounded-full text-black w-full overflow-hidden lg:px-4 " type="text" placeholder="Hinted search text">
+    <div class="absolute top-4 right-3 flex items-center ps-3 pointer-events-none bg-white" id="searchBar">
       <Icon name="mdi:search" class="w-6 h-6 text-gray-500"/>
     </div>
+    <p class="h-4 text-white text-xs mt-2"></p>
   </div>
 </header>
 
 <script>
   import { TaskContext } from "../lib/taskStore";
+  import type { Task } from "../lib/task";
 
   const taskContext = TaskContext.getInstance();
   const searchEl = document.querySelector('input');
+  const searchDiv = searchEl?.parentElement! as HTMLDivElement;
   if(!searchEl) throw new Error(`search input is not found`)
 
+  function noResult(tasks: Task[]) {
+    const pEl = document.querySelector('p')! as HTMLParagraphElement;
+    if(tasks.length === 0) {
+      pEl.textContent = "No result. Please try different search terms.";
+    } else {
+      pEl.textContent = "";
+    }
+  }
 
   searchEl.addEventListener('input', (e) => {
     const keyword = (e.target as HTMLInputElement).value;
@@ -34,7 +45,15 @@ import { Icon } from "astro-icon/components";
     if(e.code === 'delete') {
       const keyword = ''
       taskContext.updateFilter(keyword)
-    }
+    } 
+  })
+
+
+  // // taskContext.addListener(noResult)
+  taskContext.addListener(() => {
+    const columns = taskContext.getColumns()
+    const tasks = columns.map(column => column.tasks).flat()
+    noResult(tasks)
   })
 
 </script>
