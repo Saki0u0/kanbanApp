@@ -1,6 +1,6 @@
 ---
-import '@fontsource/henny-penny';
-import { Icon } from 'astro-icon/components';
+import "@fontsource/henny-penny";
+import { Icon } from "astro-icon/components";
 ---
 
 <header class="grid text-white pt-10 px-4 pb-6 grid-cols-1 gap-6 bg-[url('/illust.svg')] bg-no-repeat bg-left-bottom lg:container lg:mx-auto lg:grid-cols-4 lg:py-12 lg:items-center lg:[background-position-y:calc(100%+8px)]">
@@ -16,3 +16,25 @@ import { Icon } from 'astro-icon/components';
     </div>
   </div>
 </header>
+
+<script>
+  import { TaskContext } from "../lib/taskStore";
+
+  const taskContext = TaskContext.getInstance();
+  const searchEl = document.querySelector('input');
+  if(!searchEl) throw new Error(`search input is not found`)
+
+
+  searchEl.addEventListener('input', (e) => {
+    const keyword = (e.target as HTMLInputElement).value;
+    taskContext.updateFilter(keyword)
+  })
+
+  document.addEventListener('keydown', (e) => {
+    if(e.code === 'delete') {
+      const keyword = ''
+      taskContext.updateFilter(keyword)
+    }
+  })
+
+</script>

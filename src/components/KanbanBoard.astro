@@ -1,3 +1,7 @@
+---
+import "@fontsource/henny-penny";
+---
+
 <div class="flex gap-4">
   <div class="mb-4">
     <form id="add-task-form">
@@ -15,7 +19,7 @@
   import Sortable from "sortablejs";
 
   // タスクコンテキスト
-  const taskContext = new TaskContext();
+  const taskContext = TaskContext.getInstance();
 
   const form = document.getElementById("add-task-form");
   if (!form) throw new Error("add-task-form not found");
@@ -45,7 +49,7 @@
   };
 
   function renderTasks() {
-    const columns = taskContext.getColumns().get();
+    const columns = taskContext.getColumns();
     const taskList = document.getElementById("task-list");
     if (!taskList) throw new Error("task-list not found");
     let ids: string[] = [];
