@@ -49,22 +49,31 @@ export class TaskContext {
     }
   }
 
+  getTask(id: number, label: string) {
+    return this.$columns
+      .get()
+      .find((column) => column.label === label)
+      ?.tasks.find((task) => task.id === id);
+  }
+
   getColumns() {
     const filter = this.filter;
     if (!filter) return this.$columns.get();
 
-    const filteredColumns = this.$columns
-      .get()
-      .map((column) => {
-        const matchedTasks = column.tasks.filter(
-          (task) =>
-            task.title.toLowerCase().includes(this.filter.toLowerCase()) ||
-            task.description.toLowerCase().includes(this.filter.toLowerCase())
-        );
-        return { ...column, tasks: matchedTasks }
-      })
+    const filteredColumns = this.$columns.get().map((column) => {
+      const matchedTasks = column.tasks.filter(
+        (task) =>
+          task.title.toLowerCase().includes(this.filter.toLowerCase()) ||
+          task.description.toLowerCase().includes(this.filter.toLowerCase())
+      );
+      return { ...column, tasks: matchedTasks };
+    });
 
     return filteredColumns;
+  }
+
+  getLabels() {
+    return this.$columns.get().map((column) => column.label);
   }
 
   addColumn(label: string) {
@@ -106,9 +115,7 @@ export class TaskContext {
 
     targetColumn.tasks = [...targetColumn.tasks, newTask];
 
-    this.$columns.set(
-      columns.map((c) => (c.label === label ? targetColumn : c))
-    );
+    //this.$columns.set(columns.map((c) => (c.label === label ? targetColumn : c)));
     this.notifyListeners();
   }
 
