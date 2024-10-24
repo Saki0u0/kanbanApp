@@ -61,11 +61,8 @@ export class TaskContext {
             task.title.toLowerCase().includes(this.filter.toLowerCase()) ||
             task.description.toLowerCase().includes(this.filter.toLowerCase())
         );
-        return matchedTasks.length > 0
-          ? { ...column, tasks: matchedTasks }
-          : null;
+        return { ...column, tasks: matchedTasks }
       })
-      .filter((column) => column !== null);
 
     return filteredColumns;
   }
