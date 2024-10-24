@@ -1,63 +1,206 @@
-<div class="modal-wrapper flex items-center justify-center min-h-screen hidden">
-  <div class="modal flex relative w-2/3 p-20 justify-between rounded-3xl border border-black border-solid my-0 mx-auto bg-white">
-    <button class="close absolute top-4 left-5 bg-transparent border-none text-black text-3xl cursor-pointer">&times;</button>
-    
+<div class="modal-wrapper items-center justify-center min-h-screen hidden">
+  <div
+    class="modal flex relative w-2/3 p-20 justify-between rounded-3xl border border-black border-solid my-0 mx-auto my-[15%] bg-white"
+  >
+    <button
+      class="close absolute top-4 left-5 bg-transparent border-none text-black text-3xl cursor-pointer"
+      >&times;</button
+    >
+
     <div class="description">
-      <h1 class ="text-3xl pb-8">title</h1>
-      <p>text</p>
+      <h1
+        class="text-3xl mb-8 focus:outline-none px-2 py-0.5 rounded-md focus:bg-[#F0F0F0]"
+        id="title"
+        contenteditable="true"
+      >
+        titless
+      </h1>
+      <p
+        class="focus:outline-none px-2 py-0.5 rounded-md focus:bg-[#F0F0F0]"
+        id="description"
+        contenteditable="true"
+      >
+        text
+      </p>
     </div>
     <div class="menu">
-      <p class = "pb-4 flex">
-        <img src="../../public/Edit.svg" alt="Edit" class ="pr-2">
+      <p class="pb-4 flex">
+        <img src="../../public/Edit.svg" alt="Edit" class="pr-2 w-6 h-6" />
         Edit
       </p>
-      <div class="status flex">
-        <img src="../../public/Flag.svg" alt="flag" class ="h-5 pr-2">
-        <p class = "pb-4 pr-4">
-          Status:
-        </p>
-        <ul>
-          <li class = "pb-4">To Do</li>
-          <li class = "pb-4">In progress</li>
-          <li class = "pb-4">Done</li>
-        </ul>
+      <div class="status flex items-center pb-4">
+        <img src="../../public/Flag.svg" alt="flag" class="h-6 pr-2 w-6" />
+        <p class="pr-4">Status:</p>
+        <select
+          id="taskStatus"
+          name="taskStatus"
+          class="p-1 rounded focus:outline-none"
+        >
+        </select>
       </div>
-      <p class ="flex">
-        <img src="../../public/delete.svg" alt="delete" class ="pr-2">
-        Delete
+      <p class="flex items-center">
+        <button id="deleteButton" class="flex items-center">
+          <span class="pr-2">
+            <img src="../../public/delete.svg" alt="delete" class="w-6 h-6" />
+          </span>
+          Delete
+        </button>
       </p>
-      <img src="../../public/pumpkin.png" alt="pumpkin" class ="w-48 pt-12">
+      <img src="../../public/pumpkin.png" alt="pumpkin" class="w-48 pt-12" />
     </div>
   </div>
 </div>
 
 <script>
-  
-  function showModal(){
-    const modalWrapper = document.querySelector('.modal-wrapper')
-    if (modalWrapper){
-      modalWrapper.classList.remove('hidden')
-      console.log("Modal is shown");
+  import { TaskContext } from "../lib/taskStore";
+  import { TaskModalContext } from "../lib/taskModaStore";
+  const taskModalContext = TaskModalContext.getInstance();
+  const taskContext = TaskContext.getInstance();
+
+  function updateModal() {
+    const modalWrapper = document.querySelector(".modal-wrapper");
+    if (!modalWrapper) return;
+    const isOpen = taskModalContext.getIsOpen();
+    modalWrapper.classList.toggle("hidden", !isOpen);
+    [
+      "fixed",
+      "bg-black",
+      "bg-opacity-50",
+      "w-full",
+      "h-full",
+      "z-50",
+      "overflow-auto",
+      "left-0",
+      "top-0",
+    ].forEach((className) => {
+      modalWrapper.classList.toggle(className, isOpen);
+    });
+    if (isOpen) {
+      modalWrapper.setAttribute(
+        "column-label",
+        taskModalContext.getColumnLabel()
+      );
+      modalWrapper.setAttribute("task-id", taskModalContext.getTaskId());
+      document.body.style.overflow = "hidden";
+      addCloseListeners();
+      setUpModalContent();
+    } else {
+      document.body.style.overflow = "";
+      removeCloseListeners();
     }
   }
 
-  const editTaskIcon = document.querySelector('svg.cursor-pointer')
-  console.log(editTaskIcon)
-  if (editTaskIcon) {
-    editTaskIcon.addEventListener('click',  () => {
-      showModal();
-      console.log("click")
-    });
-  }
+  function setUpModalContent() {
+    const title = document.getElementById("title");
+    const description = document.getElementById("description");
+    const task = taskContext.getTask(
+      parseInt(taskModalContext.getTaskId()),
+      taskModalContext.getColumnLabel()
+    );
+    if (title) title.innerHTML = task?.title || "";
+    if (description) description.innerHTML = task?.description || "";
 
-   const closeButton = document.querySelector('.close');
-  if (closeButton) {
-    closeButton.addEventListener('click',() => {
-      const modalWrapper = document.querySelector('.modal-wrapper');
-      if (modalWrapper) {
-        modalWrapper.classList.add('hidden'); 
+    setupStatusSelect();
+
+    // Event listeners
+    title?.addEventListener("blur", () => {
+      taskContext.editTask(
+        taskModalContext.getColumnLabel(),
+        parseInt(taskModalContext.getTaskId()),
+        title?.innerHTML || "",
+        description?.innerHTML || ""
+      );
+    });
+
+    title?.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        title.blur();
       }
     });
-  }
-</script>
 
+    description?.addEventListener("blur", () => {
+      taskContext.editTask(
+        taskModalContext.getColumnLabel(),
+        parseInt(taskModalContext.getTaskId()),
+        title?.innerHTML || "",
+        description?.innerHTML || ""
+      );
+    });
+
+    // Delete button
+    const deleteButton = document.getElementById("deleteButton");
+    if (deleteButton) {
+      deleteButton.addEventListener("click", () => {
+        taskContext.deleteTask(
+          parseInt(taskModalContext.getTaskId()),
+          taskModalContext.getColumnLabel()
+        );
+        closeModal();
+      });
+    }
+  }
+
+  function setupStatusSelect() {
+    // Set status
+    // options をクリア
+    const statusSelect = document.getElementById("taskStatus");
+    if (statusSelect) statusSelect.innerHTML = "";
+
+    const statusOptions = taskContext.getLabels();
+    // current labelを取り除いて先頭に追加
+    statusOptions.splice(
+      statusOptions.indexOf(taskModalContext.getColumnLabel()),
+      1
+    );
+    statusOptions.unshift(taskModalContext.getColumnLabel());
+    if (statusSelect) {
+      // create options
+      statusOptions.forEach((option) => {
+        const optionEl = document.createElement("option");
+        optionEl.value = option;
+        optionEl.textContent = option;
+        statusSelect.appendChild(optionEl);
+      });
+    }
+  }
+
+  function closeModal() {
+    taskModalContext.closeModal();
+  }
+
+  function addCloseListeners() {
+    const modalWrapper = document.querySelector(".modal-wrapper");
+    const closeButton = document.querySelector(".close");
+
+    if (modalWrapper) {
+      modalWrapper.addEventListener("click", handleOutsideClick);
+    }
+    if (closeButton) {
+      closeButton.addEventListener("click", closeModal);
+    }
+  }
+
+  function removeCloseListeners() {
+    const modalWrapper = document.querySelector(".modal-wrapper");
+    const closeButton = document.querySelector(".close");
+
+    if (modalWrapper) {
+      modalWrapper.removeEventListener("click", handleOutsideClick);
+    }
+    if (closeButton) {
+      closeButton.removeEventListener("click", closeModal);
+    }
+  }
+
+  function handleOutsideClick(event: Event) {
+    if (
+      event.target &&
+      (event.target as HTMLElement).classList.contains("modal-wrapper")
+    ) {
+      closeModal();
+    }
+  }
+
+  taskModalContext.addListener(updateModal);
+</script>
