@@ -1,6 +1,6 @@
 <div class="modal-wrapper flex items-center justify-center min-h-screen hidden">
-  <div class="modal flex relative w-2/3 p-20 justify-between rounded-3xl border border-black border-solid my-0 mx-auto ">
-    <button class="absolute top-4 left-5 bg-transparent border-none text-black text-3xl cursor-pointer">&times;</button>
+  <div class="modal flex relative w-2/3 p-20 justify-between rounded-3xl border border-black border-solid my-0 mx-auto bg-white">
+    <button class="close absolute top-4 left-5 bg-transparent border-none text-black text-3xl cursor-pointer">&times;</button>
     
     <div class="description">
       <h1 class ="text-3xl pb-8">title</h1>
@@ -32,27 +32,30 @@
 </div>
 
 <script>
+  
   function showModal(){
     const modalWrapper = document.querySelector('.modal-wrapper')
     if (modalWrapper){
       modalWrapper.classList.remove('hidden')
+      console.log("Modal is shown");
     }
   }
 
-  const addTaskIcon = document.querySelector('svg[onclick="window.simpleAlert()"]')
-  if (addTaskIcon) {
-    addTaskIcon.addEventListener('click',  () => {
+  const editTaskIcon = document.querySelector('svg.cursor-pointer')
+  console.log(editTaskIcon)
+  if (editTaskIcon) {
+    editTaskIcon.addEventListener('click',  () => {
       showModal();
       console.log("click")
     });
   }
 
-   const closeButton = document.querySelector('.modal button');
+   const closeButton = document.querySelector('.close');
   if (closeButton) {
     closeButton.addEventListener('click',() => {
       const modalWrapper = document.querySelector('.modal-wrapper');
       if (modalWrapper) {
-        modalWrapper.classList.add('hidden'); // モーダルを隠す
+        modalWrapper.classList.add('hidden'); 
       }
     });
   }
