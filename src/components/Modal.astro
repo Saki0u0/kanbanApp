@@ -2,16 +2,16 @@
   class="modal-wrapper items-center justify-center min-h-screen hidden opacity-0 transition-opacity duration-300 ease-in-out"
 >
   <div
-    class="modal flex relative w-2/3 p-20 justify-between rounded-3xl border border-black border-solid mx-auto my-[15%] bg-white transform scale-95 transition-transform duration-300 ease-in-out"
+    class="modal flex flex-col gap-6 relative p-5 pt-14 justify-between rounded-3xl border border-black border-solid mx-auto my-[15%] bg-white transform scale-95 transition-transform duration-300 ease-in-out md:w-2/3 md:p-20 md:flex-row md:gap-0 md:container"
   >
     <button
-      class="close absolute top-4 left-5 bg-transparent border-none text-black text-3xl cursor-pointer"
+      class="close absolute top-3 left-5 bg-transparent border-none text-black text-3xl cursor-pointer md:top-4"
       >&times;</button
     >
 
     <div class="description">
       <h1
-        class="text-3xl mb-8 focus:outline-none px-2 py-0.5 rounded-md focus:bg-[#F0F0F0]"
+        class="text-3xl mb-4 md:mb-8 focus:outline-none px-2 py-0.5 rounded-md focus:bg-[#F0F0F0]"
         id="title"
         contenteditable="true"
       >
@@ -25,12 +25,8 @@
         text
       </p>
     </div>
-    <div class="menu">
-      <p class="pb-4 flex">
-        <img src="../../public/Edit.svg" alt="Edit" class="pr-2 w-6 h-6" />
-        Edit
-      </p>
-      <div class="status flex items-center pb-4">
+    <div class="menu flex flex-col">
+      <div class="status flex items-center pb-4 pl-1">
         <img src="../../public/Flag.svg" alt="flag" class="h-6 pr-2 w-6" />
         <p class="pr-4">Status:</p>
         <select
@@ -41,14 +37,16 @@
         </select>
       </div>
       <p class="flex items-center">
-        <button id="deleteButton" class="flex items-center">
-          <span class="pr-2">
-            <img src="../../public/delete.svg" alt="delete" class="w-6 h-6" />
+        <button id="deleteButton" class="flex items-center text-red-600">
+          <span class="pr-2 absolute top-5 right-5 md:relative md:top-0 md:right-0">
+            <img src="../../public/delete.svg" alt="delete" class="w-8 h-8 md:w-6 md:h-6 " />
           </span>
-          Delete
+          <span class="hidden  md:block">
+            Delete
+          </span>
         </button>
       </p>
-      <img src="../../public/pumpkin.png" alt="pumpkin" class="w-48 pt-12" />
+      <img src="../../public/pumpkin.png" alt="pumpkin" class="w-48 pt-12 self-end" />
     </div>
   </div>
 </div>
