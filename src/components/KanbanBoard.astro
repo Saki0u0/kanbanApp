@@ -9,9 +9,10 @@ import "@fontsource/henny-penny";
 </div>
 
 <script>
+  import Sortable from "sortablejs";
   import { TaskContext } from "../lib/taskStore";
   import { TaskModalContext } from "../lib/taskModaStore";
-  import Sortable from "sortablejs";
+  import { getUnassignedAssignee, type Assignee } from "../lib/assignee";
 
   // タスクコンテキスト
   const taskContext = TaskContext.getInstance();
@@ -60,6 +61,35 @@ import "@fontsource/henny-penny";
                       </svg>
                     </div>
                     <p class="task-description text-sm py-2 w-2/3 focus:outline-none" contenteditable="true">${task.description}</p>
+                    <div class="flex gap-2 pt-2 mt-4">
+                      ${task.assignees
+                        ?.map(
+                          (assignee) => `
+                      <div class="w-10 h-10 rounded-full border border-gray-700 flex items-center justify-center">
+                        <img src="${assignee.src}" alt="${assignee.name}" class="w-6 h-6" />
+                      </div>
+                      `
+                        )
+                        .join("")}
+                      ${
+                        getUnassignedAssignee(task.assignees ?? []).length > 0
+                          ? `
+                      <div class="w-10 h-10 rounded-full border border-gray-700 flex items-center justify-center relative">
+                        <button class="add-assignee-icon">
+                          <img src="/plus.svg" alt="add" class="w-6 h-6" />
+                        </button>
+                        <select class="add-assignee-select hidden absolute top-0 left-10 w-32 h-full">
+                          <option value="">Choose</option>
+                          ${getUnassignedAssignee(task.assignees ?? [])?.map(
+                            (assignee) =>
+                              `<option value="${assignee.name}">${assignee.name}</option>`
+                          )}
+                        </select>
+                      </div>
+                      `
+                          : ""
+                      }
+                    </div>
                   </div>
                 `
                   )
@@ -164,6 +194,28 @@ import "@fontsource/henny-penny";
         if (modalWrapper) {
           taskModalContext.openModal(taskId ?? "", columnLabel ?? "");
         }
+      });
+      const addAssigneeIcon = task.querySelector(".add-assignee-icon");
+      addAssigneeIcon?.addEventListener("click", () => {
+        const addAssigneeSelect = task.querySelector(
+          ".add-assignee-select"
+        ) as HTMLSelectElement;
+        addAssigneeSelect.classList.toggle("hidden");
+      });
+
+      const addAssigneeSelect = task.querySelector(
+        ".add-assignee-select"
+      ) as HTMLSelectElement;
+      addAssigneeSelect?.addEventListener("change", () => {
+        const taskId = task.getAttribute("data-task-id");
+        const columnLabel = column.getAttribute("column-label");
+        const assigneeName = addAssigneeSelect.value;
+
+        taskContext.addAssignee(
+          Number(taskId ?? ""),
+          columnLabel ?? "",
+          assigneeName as Assignee["name"]
+        );
       });
     });
   }

@@ -1,6 +1,8 @@
 import { atom } from "nanostores";
 import type { Task } from "./task";
 import type { Column } from "./columns";
+import type { Assignee } from "./assignee";
+import { assigneeMap } from "./assignee";
 
 export class TaskContext {
   private static instance: TaskContext;
@@ -9,7 +11,13 @@ export class TaskContext {
   private $columns = atom<Column[]>([
     {
       tasks: [
-        { id: 1, title: "Title", description: "Description 1", label: "todo" },
+        {
+          id: 1,
+          title: "Title",
+          description: "Description 1",
+          label: "todo",
+          assignees: [assigneeMap.pumpkin],
+        },
       ],
       label: "To Do",
     },
@@ -20,13 +28,20 @@ export class TaskContext {
           title: "Task 2",
           description: "Description 2",
           label: "In Progress",
+          assignees: [assigneeMap.dracula, assigneeMap.ghost],
         },
       ],
       label: "In Progress",
     },
     {
       tasks: [
-        { id: 3, title: "Task 3", description: "Description 3", label: "done" },
+        {
+          id: 3,
+          title: "Task 3",
+          description: "Description 3",
+          label: "done",
+          assignees: [assigneeMap.hat, assigneeMap.spider],
+        },
       ],
       label: "Done",
     },
@@ -119,6 +134,7 @@ export class TaskContext {
       title,
       description,
       label,
+      assignees: [],
     };
 
     targetColumn.tasks = [...targetColumn.tasks, newTask];
@@ -238,7 +254,22 @@ export class TaskContext {
 
     this.notifyListeners();
   }
-  //
+
+  addAssignee(taskId: number, label: string, assigneeName: Assignee["name"]) {
+    console.log(taskId, label, assigneeName);
+    const targetColumn = this.$columns
+      .get()
+      .find((column) => column.label === label);
+    if (!targetColumn) return;
+
+    targetColumn.tasks = targetColumn.tasks.map((task) =>
+      task.id === taskId
+        ? { ...task, assignees: [...task.assignees, assigneeMap[assigneeName]] }
+        : task
+    );
+    console.log(targetColumn.tasks);
+    this.notifyListeners();
+  }
 
   // Notification
   addListener(listener: () => void) {
