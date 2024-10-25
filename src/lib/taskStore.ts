@@ -185,6 +185,30 @@ export class TaskContext {
     this.notifyListeners();
   }
 
+  updateTaskTitle(taskId: number, label: string, newTitle: string) {
+    const targetColumn = this.$columns
+      .get()
+      .find((column) => column.label === label);
+    if (!targetColumn) return;
+
+    targetColumn.tasks = targetColumn.tasks.map((task) =>
+      task.id === taskId ? { ...task, title: newTitle } : task
+    );
+    this.notifyListeners();
+  }
+
+  updateTaskDescription(taskId: number, label: string, newDescription: string) {
+    const targetColumn = this.$columns
+      .get()
+      .find((column) => column.label === label);
+    if (!targetColumn) return;
+
+    targetColumn.tasks = targetColumn.tasks.map((task) =>
+      task.id === taskId ? { ...task, description: newDescription } : task
+    );
+    this.notifyListeners();
+  }
+
   deleteTask(id: number, label: string) {
     const targetColumn = this.$columns
       .get()
