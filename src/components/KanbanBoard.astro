@@ -81,13 +81,20 @@ import "@fontsource/henny-penny";
                         <button class="add-assignee-icon">
                           <img src="/plus.svg" alt="add" class="w-6 h-6" />
                         </button>
-                        <select class="add-assignee-select hidden absolute top-0 left-10 w-32 h-full">
-                          <option value="">Choose</option>
-                          ${getUnassignedAssignee(task.assignees ?? [])?.map(
-                            (assignee) =>
-                              `<option value="${assignee.name}">${assignee.name}</option>`
-                          )}
-                        </select>
+                        <div class="add-assignee-dropdown hidden absolute top-full left-0 mt-2 w-32 bg-white border border-gray-300 rounded-md shadow-lg z-10">
+                          <ul>
+                            ${getUnassignedAssignee(task.assignees ?? [])
+                              ?.map(
+                                (assignee) => `
+                              <li class="px-4 py-2 hover:bg-gray-100 cursor-pointer" data-assignee="${assignee.name}">
+                                <img src="${assignee.src}" alt="${assignee.name}" class="w-4 h-4 inline-block mr-2" />
+                                ${assignee.name}
+                              </li>
+                            `
+                              )
+                              .join("")}
+                          </ul>
+                        </div>
                       </div>
                       `
                           : ""
@@ -261,10 +268,56 @@ import "@fontsource/henny-penny";
     });
   }
 
+  function setupAssigneeDropdown() {
+    const addAssigneeIcons = document.querySelectorAll(".add-assignee-icon");
+    addAssigneeIcons.forEach((icon) => {
+      icon.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const dropdown = icon.nextElementSibling;
+        if (!dropdown) return;
+        dropdown.classList.toggle("hidden");
+      });
+    });
+
+    const assigneeOptions = document.querySelectorAll(
+      ".add-assignee-dropdown li[data-assignee]"
+    );
+    assigneeOptions.forEach((option) => {
+      if (!option) return;
+      option?.addEventListener("click", () => {
+        const taskId = option
+          .closest(".task-item")
+          ?.getAttribute("data-task-id");
+        const columnLabel = option
+          .closest(".column-container")
+          ?.getAttribute("column-label");
+        const assigneeName = option.getAttribute("data-assignee");
+
+        taskContext.addAssignee(
+          Number(taskId ?? ""),
+          columnLabel ?? "",
+          assigneeName as Assignee["name"]
+        );
+
+        option.closest(".add-assignee-dropdown")?.classList.add("hidden");
+      });
+    });
+
+    // ドロップダウン外をクリックしたら閉じる
+    document.addEventListener("click", () => {
+      document
+        .querySelectorAll(".add-assignee-dropdown")
+        .forEach((dropdown) => {
+          dropdown.classList.add("hidden");
+        });
+    });
+  }
+
   function rendering() {
     renderTasks();
     setupColumnLabelEditing();
     setupColumn();
+    setupAssigneeDropdown();
   }
 
   // 初期レンダリング
