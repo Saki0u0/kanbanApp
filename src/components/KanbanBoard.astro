@@ -3,11 +3,6 @@ import "@fontsource/henny-penny";
 ---
 
 <div class="flex gap-4 px-6 pb-10 lg:overflow-scroll lg:flex-1 lg:mx-auto">
-  <div class="mb-4">
-    <form id="add-task-form">
-      <button type="submit">Add Task</button>
-    </form>
-  </div>
   <div id="task-list" class="flex flex-col gap-4 lg:flex-row">
     <!-- タスクリストがここに表示されます -->
   </div>
@@ -21,17 +16,6 @@ import "@fontsource/henny-penny";
   // タスクコンテキスト
   const taskContext = TaskContext.getInstance();
   const taskModalContext = TaskModalContext.getInstance();
-
-  const form = document.getElementById("add-task-form");
-  if (!form) throw new Error("add-task-form not found");
-
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
-    console.log("submit");
-    const title = "Hoge";
-    const description = "XX";
-    taskContext.addTask(title, description, "To Do");
-  });
 
   declare global {
     interface Window {
