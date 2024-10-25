@@ -65,8 +65,11 @@ import "@fontsource/henny-penny";
                       ${task.assignees
                         ?.map(
                           (assignee) => `
-                      <div class="w-10 h-10 rounded-full border border-gray-700 flex items-center justify-center">
+                      <div class="w-10 h-10 rounded-full border border-gray-700 flex items-center justify-center relative group">
                         <img src="${assignee.src}" alt="${assignee.name}" class="w-6 h-6" />
+                        <button class="remove-assignee-icon absolute -top-2 -right-2 bg-white rounded-full p-0.5 hidden group-hover:block">
+                          <img src="/close.svg" alt="remove" class="w-4 h-4" />
+                        </button>
                       </div>
                       `
                         )
@@ -195,6 +198,23 @@ import "@fontsource/henny-penny";
           taskModalContext.openModal(taskId ?? "", columnLabel ?? "");
         }
       });
+
+      const removeAssigneeIcons = task.querySelectorAll(
+        ".remove-assignee-icon"
+      ) as NodeListOf<HTMLElement>;
+      removeAssigneeIcons.forEach((icon) => {
+        icon.addEventListener("click", () => {
+          const taskId = task.getAttribute("data-task-id");
+          const columnLabel = column.getAttribute("column-label");
+          const assigneeName = icon.parentElement?.querySelector("img")?.alt;
+          taskContext.removeAssignee(
+            Number(taskId ?? ""),
+            columnLabel ?? "",
+            assigneeName as Assignee["name"]
+          );
+        });
+      });
+
       const addAssigneeIcon = task.querySelector(".add-assignee-icon");
       addAssigneeIcon?.addEventListener("click", () => {
         const addAssigneeSelect = task.querySelector(

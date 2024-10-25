@@ -256,7 +256,6 @@ export class TaskContext {
   }
 
   addAssignee(taskId: number, label: string, assigneeName: Assignee["name"]) {
-    console.log(taskId, label, assigneeName);
     const targetColumn = this.$columns
       .get()
       .find((column) => column.label === label);
@@ -268,6 +267,27 @@ export class TaskContext {
         : task
     );
     console.log(targetColumn.tasks);
+    this.notifyListeners();
+  }
+
+  removeAssignee(
+    taskId: number,
+    label: string,
+    assigneeName: Assignee["name"]
+  ) {
+    const targetColumn = this.$columns
+      .get()
+      .find((column) => column.label === label);
+    if (!targetColumn) return;
+
+    targetColumn.tasks = targetColumn.tasks.map((task) =>
+      task.id === taskId
+        ? {
+            ...task,
+            assignees: task.assignees.filter((a) => a.name !== assigneeName),
+          }
+        : task
+    );
     this.notifyListeners();
   }
 
