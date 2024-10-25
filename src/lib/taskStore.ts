@@ -100,6 +100,7 @@ export class TaskContext {
     this.notifyListeners();
   }
 
+  // Task Manipulation
   addTask(title: string, description: string, label: string) {
     const columns = this.$columns.get();
     const targetColumn = columns.find((column) => column.label === label);
@@ -121,51 +122,31 @@ export class TaskContext {
 
   updateTaskLabel(taskId: number, preLabel: string, newLabel: string) {
     const columns = this.$columns.get();
+    const fromColumn = columns.find((column) => column.label === preLabel);
+    const toColumn = columns.find((column) => column.label === newLabel);
+    if (!fromColumn || !toColumn) return;
 
-    const targetColumn = columns.find((column) => column.label === preLabel);
-    if (!targetColumn) return;
+    const taskIndex = fromColumn.tasks.findIndex((task) => task.id === taskId);
+    if (taskIndex === -1) return;
 
-    // change task label
-    const updatedTask = targetColumn.tasks.find((task) => task.id === taskId);
-    if (!updatedTask) return;
+    // Remove the task from the source column and get it
+    const [task] = fromColumn.tasks.splice(taskIndex, 1);
+    // Insert the task at the new index in the destination column
+    toColumn.tasks.push(task);
 
-    const updatedTaskNewLabel = { ...updatedTask, label: newLabel };
-
-    // previous task
-    const removedTask = targetColumn.tasks.filter((task) => task.id !== taskId);
-    if (!removedTask) return;
-
-    const updatedPreColumn = { ...targetColumn, tasks: removedTask };
-
-    // new
-    const newColumn = columns.find((column) => column.label === newLabel);
-    if (!newColumn) return;
-
-    const updatedNewColumn = {
-      ...newColumn,
-      tasks: [...newColumn.tasks, updatedTaskNewLabel],
-    };
-
-    // update entire
-    this.$columns.set(
-      columns.map((c) => (c.label === newLabel ? updatedNewColumn : c))
-    );
-
+    // Notification
     this.notifyListeners();
   }
 
   moveTask(
     taskId: number,
-    fromColumnLabel: string,
-    toColumnLabel: string,
+    preLabel: string,
+    newLabel: string,
     newIndex: number
   ) {
     const columns = this.$columns.get();
-    const fromColumn = columns.find(
-      (column) => column.label === fromColumnLabel
-    );
-    const toColumn = columns.find((column) => column.label === toColumnLabel);
-
+    const fromColumn = columns.find((column) => column.label === preLabel);
+    const toColumn = columns.find((column) => column.label === newLabel);
     if (!fromColumn || !toColumn) return;
 
     const taskIndex = fromColumn.tasks.findIndex((task) => task.id === taskId);
@@ -177,8 +158,7 @@ export class TaskContext {
     // Insert the task at the new index in the destination column
     toColumn.tasks.splice(newIndex, 0, task);
 
-    // Update the columns in the store
-    this.$columns.set([...columns]);
+    // Notification
     this.notifyListeners();
   }
 
@@ -227,7 +207,9 @@ export class TaskContext {
 
     this.notifyListeners();
   }
+  //
 
+  // Notification
   addListener(listener: () => void) {
     this.listenerFunctions.push(listener);
   }
@@ -235,4 +217,5 @@ export class TaskContext {
   notifyListeners() {
     this.listenerFunctions.forEach((listener) => listener());
   }
+  // end of Notification
 }

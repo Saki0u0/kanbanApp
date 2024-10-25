@@ -128,6 +128,13 @@
       );
     });
 
+    description?.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        description.blur();
+      }
+    });
+
     // Delete button
     const deleteButton = document.getElementById("deleteButton");
     if (deleteButton) {
@@ -163,6 +170,17 @@
         statusSelect.appendChild(optionEl);
       });
     }
+
+    statusSelect?.addEventListener("change", (event) => {
+      const target = event.target as HTMLSelectElement;
+      if (target.value === taskModalContext.getColumnLabel()) return;
+
+      taskContext.updateTaskLabel(
+        parseInt(taskModalContext.getTaskId()),
+        taskModalContext.getColumnLabel(),
+        target.value
+      );
+    });
   }
 
   function closeModal() {
