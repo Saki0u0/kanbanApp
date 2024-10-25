@@ -43,9 +43,9 @@ import "@fontsource/henny-penny";
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="cursor-pointer add-task-icon">
                             <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
                         </svg>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="cursor-pointer">
-                            <path fill="currentColor" d="M16 12a2 2 0 0 1 2-2a2 2 0 0 1 2 2a2 2 0 0 1-2 2a2 2 0 0 1-2-2m-6 0a2 2 0 0 1 2-2a2 2 0 0 1 2 2a2 2 0 0 1-2 2a2 2 0 0 1-2-2m-6 0a2 2 0 0 1 2-2a2 2 0 0 1 2 2a2 2 0 0 1-2 2a2 2 0 0 1-2-2"/>
-                        </svg>
+                        <button class="delete-column-icon h-6">
+                          <img src="/delete.svg" alt="delete" class="w-6 h-6" />
+                        </button>
                     </div>
                 </div>
               <div class="flex flex-col gap-2 sortable-container min-h-12" data-column-label="${column.label}">
@@ -112,6 +112,10 @@ import "@fontsource/henny-penny";
         "Description",
         column.getAttribute("column-label") ?? ""
       );
+    });
+    const deleteColumnIcon = column.querySelector(".delete-column-icon");
+    deleteColumnIcon?.addEventListener("click", () => {
+      taskContext.deleteColumn(column.getAttribute("column-label") ?? "");
     });
   }
 

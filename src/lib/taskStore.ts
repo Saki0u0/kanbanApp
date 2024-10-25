@@ -89,6 +89,13 @@ export class TaskContext {
     this.notifyListeners();
   }
 
+  deleteColumn(label: string) {
+    this.$columns.set(
+      this.$columns.get().filter((column) => column.label !== label)
+    );
+    this.notifyListeners();
+  }
+
   updateColumnLabel(label: string, newLabel: string) {
     const columns = this.$columns.get();
     const targetColumn = columns.find((column) => column.label === label);
