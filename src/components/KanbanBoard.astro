@@ -2,14 +2,13 @@
 import "@fontsource/henny-penny";
 ---
 
-<div class="flex gap-4">
+<div class="flex gap-4 px-6 pb-10 lg:overflow-scroll lg:flex-1 lg:mx-auto">
   <div class="mb-4">
     <form id="add-task-form">
       <button type="submit">Add Task</button>
     </form>
-    <button type="button" id="add-column-button">Add Column</button>
   </div>
-  <div id="task-list" class="flex gap-4">
+  <div id="task-list" class="flex flex-col gap-4 lg:flex-row">
     <!-- タスクリストがここに表示されます -->
   </div>
 </div>
@@ -32,12 +31,6 @@ import "@fontsource/henny-penny";
     const title = "Hoge";
     const description = "XX";
     taskContext.addTask(title, description, "To Do");
-  });
-
-  const addColumnButton = document.getElementById("add-column-button");
-  if (!addColumnButton) throw new Error("add-column-button not found");
-  addColumnButton.addEventListener("click", () => {
-    taskContext.addColumn("New Column");
   });
 
   declare global {
