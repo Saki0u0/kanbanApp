@@ -52,11 +52,11 @@ import "@fontsource/henny-penny";
       .map((column) => {
         ids.push(`column-${column.label}`);
         return `
-            <div id="column-${column.label}" class="border border-gray-300 rounded-[24px] p-6 bg-[#E1E1E1] w-[400px]">
+            <div id="column-${column.label}" class="column-container border border-gray-300 rounded-[24px] p-6 bg-[#E1E1E1] w-[400px]" column-label="${column.label}">
                 <div class="flex justify-between mb-4">
                     <h3 id="column-title-${column.label}" class="text-2xl font-inter column-title focus:outline-none px-2 py-0.5 rounded-md focus:bg-[#F0F0F0]" data-column-id="${column.label}" contenteditable="true">${column.label}</h3>
                     <div class="flex gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" onclick="window.simpleAlert()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="cursor-pointer add-task-icon">
                             <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
                         </svg>
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="cursor-pointer">
@@ -70,12 +70,12 @@ import "@fontsource/henny-penny";
                     (task) => `
                   <div class="task-item border border-gray-300 rounded-[24px] p-2 bg-[#ffffff] p-4 hover:translate-y-[-4px] hover:shadow-lg transition-transform duration-300" data-task-id="${task.id}" data-column-label="${column.label}">
                     <div class="flex justify-between">
-                      <h4 class="text-2xl ">${task.title}</h4>
+                      <h4 class="task-title text-2xl w-1/2 overflow-hidden whitespace-nowrap focus:outline-none" contenteditable="true">${task.title}</h4>
                       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="cursor-pointer edit-task-icon">
                         <path fill="currentColor" d="M5 3c-1.11 0-2 .89-2 2v14c0 1.11.89 2 2 2h14c1.11 0 2-.89 2-2v-7h-2v7H5V5h7V3H5m12.78 1a.69.69 0 0 0-.48.2l-1.22 1.21l2.5 2.5L19.8 6.7c.26-.26.26-.7 0-.95L18.25 4.2c-.13-.13-.3-.2-.47-.2m-2.41 2.12L8 13.5V16h2.5l7.37-7.37l-2.5-2.5Z"/>
                       </svg>
                     </div>
-                    <p class="text-sm py-2">${task.description}</p>
+                    <p class="task-description text-sm py-2 w-2/3 focus:outline-none" contenteditable="true">${task.description}</p>
                   </div>
                 `
                   )
@@ -112,6 +112,74 @@ import "@fontsource/henny-penny";
     });
   }
 
+  function setupColumn() {
+    const columns = document.querySelectorAll(".column-container");
+    columns.forEach((column) => {
+      setupColumnButton(column as HTMLElement);
+      setupTask(column as HTMLElement);
+    });
+  }
+
+  function setupColumnButton(column: HTMLElement) {
+    const addTaskIcon = column.querySelector(".add-task-icon");
+    addTaskIcon?.addEventListener("click", () => {
+      taskContext.addTask(
+        "Title",
+        "Description",
+        column.getAttribute("column-label") ?? ""
+      );
+    });
+  }
+
+  function setupTask(column: HTMLElement) {
+    const tasks = column.querySelectorAll(".task-item");
+    tasks.forEach((task) => {
+      const taskId = task.getAttribute("data-task-id");
+      const columnLabel = column.getAttribute("column-label");
+      const title = task.querySelector(".task-title") as HTMLElement;
+      title?.addEventListener("blur", () => {
+        taskContext.updateTaskTitle(
+          Number(taskId ?? ""),
+          columnLabel ?? "",
+          title?.innerHTML ?? ""
+        );
+      });
+      title?.addEventListener("keydown", (e) => {
+        const event = e as KeyboardEvent;
+        if (event.key === "Enter") {
+          e.preventDefault();
+          title.blur();
+        }
+      });
+
+      const description = task.querySelector(
+        ".task-description"
+      ) as HTMLElement;
+      description?.addEventListener("blur", () => {
+        taskContext.updateTaskDescription(
+          Number(taskId ?? ""),
+          columnLabel ?? "",
+          description?.innerHTML ?? ""
+        );
+      });
+      description?.addEventListener("keydown", (e) => {
+        const event = e as KeyboardEvent;
+        if (event.key === "Enter") {
+          e.preventDefault();
+          description.blur();
+        }
+      });
+
+      const editTaskIcon = task.querySelector(".edit-task-icon");
+      editTaskIcon?.addEventListener("click", () => {
+        const modalWrapper = document.querySelector(".modal-wrapper");
+        if (modalWrapper) {
+          taskModalContext.openModal(taskId ?? "", columnLabel ?? "");
+        }
+      });
+    });
+  }
+
   function setupColumnLabelEditing() {
     const columnTitles = document.querySelectorAll(".column-title");
     columnTitles.forEach((title) => {
@@ -133,29 +201,15 @@ import "@fontsource/henny-penny";
     });
   }
 
-  function setUpModal() {
-    console.log("setUpModal");
-    const taskItems = document.querySelectorAll(".task-item");
-    taskItems.forEach((item) => {
-      const taskId = item.getAttribute("data-task-id");
-      const columnLabel = item.getAttribute("data-column-label");
-      const editTaskIcon = item.querySelector(".edit-task-icon");
-      editTaskIcon?.addEventListener("click", () => {
-        console.log("edit task icon clicked");
-        const modalWrapper = document.querySelector(".modal-wrapper");
-        if (modalWrapper) {
-          taskModalContext.openModal(taskId ?? "", columnLabel ?? "");
-        }
-      });
-    });
+  function rendering() {
+    renderTasks();
+    setupColumnLabelEditing();
+    setupColumn();
   }
 
   // 初期レンダリング
-  renderTasks();
-  setupColumnLabelEditing();
-  setUpModal();
+  rendering();
+
   // listener
-  taskContext.addListener(renderTasks);
-  taskContext.addListener(setupColumnLabelEditing);
-  taskContext.addListener(setUpModal);
+  taskContext.addListener(rendering);
 </script>

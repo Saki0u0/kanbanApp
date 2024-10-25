@@ -1,6 +1,8 @@
-<div class="modal-wrapper items-center justify-center min-h-screen hidden">
+<div
+  class="modal-wrapper items-center justify-center min-h-screen hidden opacity-0 transition-opacity duration-300 ease-in-out"
+>
   <div
-    class="modal flex relative w-2/3 p-20 justify-between rounded-3xl border border-black border-solid my-0 mx-auto my-[15%] bg-white"
+    class="modal flex relative w-2/3 p-20 justify-between rounded-3xl border border-black border-solid mx-auto my-[15%] bg-white transform scale-95 transition-transform duration-300 ease-in-out"
   >
     <button
       class="close absolute top-4 left-5 bg-transparent border-none text-black text-3xl cursor-pointer"
@@ -22,6 +24,8 @@
       >
         text
       </p>
+      <!--svg-->
+      <img src="/asignee/pumpkin-icon.svg" alt="Edit" class="pr-2 w-6 h-6" />
     </div>
     <div class="menu">
       <p class="pb-4 flex">
@@ -50,6 +54,18 @@
     </div>
   </div>
 </div>
+<style>
+  .modal-wrapper {
+    position: fixed;
+    background-color: rgba(0, 0, 0, 0.5);
+    width: 100%;
+    height: 100%;
+    z-index: 50;
+    overflow: auto;
+    left: 0;
+    top: 0;
+  }
+</style>
 
 <script>
   import { TaskContext } from "../lib/taskStore";
@@ -61,21 +77,14 @@
     const modalWrapper = document.querySelector(".modal-wrapper");
     if (!modalWrapper) return;
     const isOpen = taskModalContext.getIsOpen();
-    modalWrapper.classList.toggle("hidden", !isOpen);
-    [
-      "fixed",
-      "bg-black",
-      "bg-opacity-50",
-      "w-full",
-      "h-full",
-      "z-50",
-      "overflow-auto",
-      "left-0",
-      "top-0",
-    ].forEach((className) => {
-      modalWrapper.classList.toggle(className, isOpen);
-    });
+    //modalWrapper.classList.toggle("hidden", !isOpen);
+
     if (isOpen) {
+      modalWrapper.classList.remove("hidden");
+      //@ts-ignore force reflow
+      void modalWrapper.offsetWidth;
+      modalWrapper.classList.add("opacity-100");
+      modalWrapper.classList.add("scale-100");
       modalWrapper.setAttribute(
         "column-label",
         taskModalContext.getColumnLabel()
@@ -85,6 +94,12 @@
       addCloseListeners();
       setUpModalContent();
     } else {
+      modalWrapper.classList.remove("opacity-100");
+      modalWrapper.classList.remove("scale-100");
+      setTimeout(() => {
+        modalWrapper.classList.add("hidden");
+      }, 300);
+
       document.body.style.overflow = "";
       removeCloseListeners();
     }
