@@ -8,50 +8,72 @@ export class TaskContext {
   private static instance: TaskContext;
   private filter: string = "";
   private listenerFunctions: (() => void)[] = [];
-  private $columns = atom<Column[]>([
-    {
-      tasks: [
-        {
-          id: 1,
-          title: "Title",
-          description: "Description 1",
-          label: "todo",
-          assignees: [assigneeMap.pumpkin],
-        },
-      ],
-      label: "To Do",
-    },
-    {
-      tasks: [
-        {
-          id: 2,
-          title: "Task 2",
-          description: "Description 2",
-          label: "In Progress",
-          assignees: [assigneeMap.dracula, assigneeMap.ghost],
-        },
-      ],
-      label: "In Progress",
-    },
-    {
-      tasks: [
-        {
-          id: 3,
-          title: "Task 3",
-          description: "Description 3",
-          label: "done",
-          assignees: [assigneeMap.hat, assigneeMap.spider],
-        },
-      ],
-      label: "Done",
-    },
-  ]);
+  private $columns = atom<Column[]>([]);
 
   static getInstance() {
     if (!TaskContext.instance) {
       TaskContext.instance = new TaskContext();
     }
+    console.log("TaskContext instance created");
+    console.log(TaskContext.instance);
     return TaskContext.instance;
+  }
+
+  private constructor() {
+    this.loadFromLocalStorage();
+  }
+
+  private loadFromLocalStorage() {
+    const storedColumns = localStorage.getItem("tasks");
+    if (storedColumns) {
+      this.$columns.set(JSON.parse(storedColumns));
+    } else {
+      this.$columns.set([
+        {
+          tasks: [
+            {
+              id: 1,
+              title: "Carve Pumpkin",
+              description:
+                "Create jack-o'-lanterns for the front porch. Don't forget the LED candles!",
+              label: "todo",
+              assignees: [assigneeMap.pumpkin],
+            },
+          ],
+          label: "To Do",
+        },
+        {
+          tasks: [
+            {
+              id: 2,
+              title: "Prepare Witch Costume",
+              description:
+                "This year's theme: Wicked Witch!  Find the pointy hat and broomstick.",
+              label: "In Progress",
+              assignees: [assigneeMap.dracula, assigneeMap.ghost],
+            },
+          ],
+          label: "In Progress",
+        },
+        {
+          tasks: [
+            {
+              id: 3,
+              title: "Stock Up on Treats",
+              description:
+                "Buy candy, cookies, and other treats for Halloween.",
+              label: "done",
+              assignees: [assigneeMap.hat, assigneeMap.spider],
+            },
+          ],
+          label: "Done",
+        },
+      ]);
+    }
+  }
+
+  private saveToLocalStorage() {
+    localStorage.setItem("tasks", JSON.stringify(this.$columns.get()));
   }
 
   updateFilter(keyword: string) {
@@ -298,6 +320,7 @@ export class TaskContext {
 
   notifyListeners() {
     this.listenerFunctions.forEach((listener) => listener());
+    this.saveToLocalStorage();
   }
   // end of Notification
 }
